@@ -1,0 +1,9 @@
+﻿https://www.tiktok.com/@cobaedit7/video/7224874208780684550
+AdvancedConfigure: { "IsOneWordPerLine": true, "IsUseSyl": true }
+đặt viền màu đỏ, độ dày 2
+;start
+Comment: 1,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("start2syl",0,0)!{\an5\pos($center,$middle)}
+;phóng to đổi màu
+Comment: 2,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("syl",0,0)!{\an5\pos($center,$middle)}
+;end
+Comment: 1,0:00:00.10,0:00:05.00,Default,,0,0,0,template syl noblank,!retime("syl2end",0,0)!{\an5\pos($center,$middle)\fad(0,050)}

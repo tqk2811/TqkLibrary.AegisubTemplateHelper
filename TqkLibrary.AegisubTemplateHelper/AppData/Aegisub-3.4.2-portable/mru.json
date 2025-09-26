@@ -1,0 +1,19 @@
+{
+	"Audio" : [
+		"D:\\test.mp4",
+		"D:\\UserProfiles\\Videos\\test.mp4"
+	],
+	"Find" : [],
+	"Keyframes" : [],
+	"Replace" : [],
+	"Subtitle" : [
+		"D:\\out.ass",
+		"D:\\test2.ass",
+		"D:\\test.ass"
+	],
+	"Timecodes" : [],
+	"Video" : [
+		"D:\\test.mp4",
+		"D:\\UserProfiles\\Videos\\test.mp4"
+	]
+}

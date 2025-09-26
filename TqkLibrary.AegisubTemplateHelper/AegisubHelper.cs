@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TqkLibrary.AegisubTemplateHelper.DataClasses;
+using TqkLibrary.AegisubTemplateHelper.Enums;
+using TqkLibrary.AegisubTemplateHelper.Interfaces;
+
+namespace TqkLibrary.AegisubTemplateHelper
+{
+    public class AegisubHelper
+    {
+        public required IEnumerable<ISentence> Sentences { get; set; }
+        public required string WorkingDir { get; set; }
+        public required string GenerateOutputSubFilePath { get; set; }
+        public required AssScriptInfoData ScriptInfo { get; set; }//video size
+        public required AssStyleData Style { get; set; }
+        public required AegisubTemplateConfigureData Template { get; set; }
+
+        public required int MaxWidth { get; set; }
+        public double Speed { get; set; } = 1.0;
+
+        public async Task GenerateAssFileAsync()
+        {
+            AdvancedConfigure advancedConfigure = (await Template.GetForceConfigure()) ?? new();
+            SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
+
+            List<Dialogue> dialogues = new List<Dialogue>();
+            foreach (ISentence sentence in Sentences.Where(x => x.Words.Any()))
+            {
+                var lines = sentence.SplitWords(Style, advancedConfigure.IsOneWordPerLine, MaxWidth)
+                    .Select(x => x.ToList())
+                    .Where(x => x.Any())
+                    .ToList();
+                var allWords = lines.SelectMany(x => x).ToList();
+                int wordIndex = 0;
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    var words = lines[i];
+
+                    TimeSpan start = words.First().Start;
+                    TimeSpan end = words.Last().End;
+                    if (Speed != 1.0)
+                    {
+                        start = start / Speed;
+                        end = end / Speed;
+                    }
+                    Dialogue dialogue = new Dialogue()
+                    {
+                        Layer = 0,
+                        Start = start,
+                        End = end,
+                        Style = Style.Name,
+                        Name = null,
+                        MarginL = 0,
+                        MarginR = 0,
+                        MarginV = 0,
+                        Effect = null,
+                    };
+
+                    for (int j = 0; j < words.Count; j++)
+                    {
+                        var current = words[j];
+                        DialogueWordEffect wordEffect = new()
+                        {
+                            Text = current.Word,
+                            WordTime = (current.End - current.Start) / Speed,
+                            Effect = effect
+                        };
+                        dialogue.DialogueTextEffects.Add(wordEffect);
+
+                        var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
+                        if (next is not null)
+                        {
+                            //insert space
+                            DialogueWordEffect spaceEffect = new()
+                            {
+                                Text = " ",
+                                WordTime = (next.Start - current.End) / Speed,
+                                Effect = effect
+                            };
+                            dialogue.DialogueTextEffects.Add(spaceEffect);
+                        }
+                        wordIndex++;
+                    }
+
+                    dialogues.Add(dialogue);
+                }
+            }
+
+            string tempSubPath = Path.Combine(WorkingDir, $"{Guid.NewGuid()}.ass");
+            using (StreamWriter streamWriter = new StreamWriter(tempSubPath, false, Encoding.UTF8))
+            {
+                streamWriter.WriteLine(ScriptInfo);//[Script Info]
+                streamWriter.WriteLine();
+                streamWriter.WriteLine(Style);//[V4+ Styles]
+                streamWriter.WriteLine();
+                streamWriter.WriteLine(AssEventData.Event);//[Events]
+                foreach (var line in await Template.GetSubCommentsAsync())
+                {
+                    streamWriter.WriteLine(line);
+                }
+                dialogues.ForEach(streamWriter.WriteLine);
+            }
+
+            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            {
+                FileName = Path.Combine(Singleton.AegisubDir, "aegisub-cli.exe"),
+                RedirectStandardOutput = false,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = Singleton.AegisubDir,
+            };
+            processStartInfo.ArgumentList.Add("--automation");
+            processStartInfo.ArgumentList.Add("kara-templater.lua");
+            processStartInfo.ArgumentList.Add(tempSubPath);
+            processStartInfo.ArgumentList.Add(GenerateOutputSubFilePath);
+            processStartInfo.ArgumentList.Add("Apply karaoke template");
+            using Process? process = Process.Start(processStartInfo);
+            if (process is null)
+                throw new InvalidOperationException($"Can't start process aegisub-cli");
+            await process.WaitForExitAsync();
+            if (process.ExitCode != 0)
+                throw new Exception($"generate failed");
+        }
+
+    }
+}
