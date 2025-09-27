@@ -15,7 +15,7 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
 
 
         static readonly Regex regex = new Regex("\\[([A-z0-9]+),([A-z0-9]+)\\]");
-        public async Task LoadFieldAsync()
+        public virtual async Task LoadFieldAsync()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
             lines = lines.Where(x => x.StartsWith("Comment")).ToArray();
@@ -46,7 +46,7 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
             }
         }
 
-        public async Task<IEnumerable<string>> GetSubCommentsAsync()
+        public virtual async Task<IEnumerable<string>> GetSubCommentsAsync()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
             lines = lines
@@ -81,7 +81,7 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
             return lines;
         }
 
-        public async Task<AdvancedConfigure?> GetForceConfigure()
+        public virtual async Task<AdvancedConfigure?> GetForceConfigure()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
             var forceConfigure = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));

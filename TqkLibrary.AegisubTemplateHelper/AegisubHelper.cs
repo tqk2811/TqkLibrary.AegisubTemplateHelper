@@ -23,7 +23,7 @@ namespace TqkLibrary.AegisubTemplateHelper
         public required int MaxWidth { get; set; }
         public double Speed { get; set; } = 1.0;
 
-        public async Task GenerateAssFileAsync()
+        public virtual async Task GenerateAssFileAsync()
         {
             AdvancedConfigure advancedConfigure = (await Template.GetForceConfigure()) ?? new();
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
