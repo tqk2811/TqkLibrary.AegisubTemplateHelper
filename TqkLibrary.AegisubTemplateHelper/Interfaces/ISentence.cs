@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace TqkLibrary.AegisubTemplateHelper.Interfaces
 {
-    public interface ISentence
+    public interface ISentence : ITime
     {
         string Text { get; }
-        TimeSpan Start { get; }
-        TimeSpan End { get; }
         IReadOnlyList<IWord> Words { get; }
     }
 }

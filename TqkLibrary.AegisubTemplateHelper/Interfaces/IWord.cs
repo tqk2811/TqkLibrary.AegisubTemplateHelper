@@ -1,9 +1,7 @@
 ﻿namespace TqkLibrary.AegisubTemplateHelper.Interfaces
 {
-    public interface IWord
+    public interface IWord : ITime
     {
         string Word { get; }
-        TimeSpan Start { get; }
-        TimeSpan End { get; }
     }
 }
