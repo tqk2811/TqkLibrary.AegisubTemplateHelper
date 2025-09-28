@@ -64,25 +64,25 @@ namespace TqkLibrary.AegisubTemplateHelper
                     for (int j = 0; j < words.Count; j++)
                     {
                         var current = words[j];
-                        DialogueWordEffect wordEffect = new()
+                            DialogueSyllableEffect wordEffect = new()
                         {
-                            Text = current.Word,
+                                Syllable = current.Word,
                             WordTime = (current.End - current.Start) / Speed,
                             Effect = effect
                         };
-                        dialogue.DialogueTextEffects.Add(wordEffect);
+                            dialogue.DialogueSyllableEffects.Add(wordEffect);
 
                         var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
                         if (next is not null)
                         {
                             //insert space
-                            DialogueWordEffect spaceEffect = new()
+                                DialogueSyllableEffect spaceEffect = new()
                             {
-                                Text = " ",
+                                    Syllable = " ",
                                 WordTime = (next.Start - current.End) / Speed,
                                 Effect = effect
                             };
-                            dialogue.DialogueTextEffects.Add(spaceEffect);
+                                dialogue.DialogueSyllableEffects.Add(spaceEffect);
                         }
                         wordIndex++;
                     }

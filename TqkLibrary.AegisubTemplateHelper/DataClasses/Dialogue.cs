@@ -14,9 +14,9 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
         public int MarginR { get; set; } = 0;
         public int MarginV { get; set; } = 0;
         public string? Effect { get; set; }
-        public string Text => string.Join(string.Empty, DialogueTextEffects);
+        public string Text => string.Join(string.Empty, DialogueSyllableEffects);
 
-        public List<DialogueWordEffect> DialogueTextEffects { get; } = new();
+        public List<DialogueSyllableEffect> DialogueSyllableEffects { get; } = new();
 
         public static string Format
         {
