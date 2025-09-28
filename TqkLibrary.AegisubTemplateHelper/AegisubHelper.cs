@@ -29,8 +29,10 @@ namespace TqkLibrary.AegisubTemplateHelper
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
             List<Dialogue> dialogues = new List<Dialogue>();
-            foreach (ISentence sentence in Sentences.Where(x => x.Words.Any()))
+            foreach (ISentence sentence in Sentences)
             {
+                if (sentence.Words.Any())
+                {
                 var lines = sentence.SplitWords(Style, advancedConfigure.IsOneWordPerLine, MaxWidth)
                     .Select(x => x.ToList())
                     .Where(x => x.Any())
@@ -87,6 +89,32 @@ namespace TqkLibrary.AegisubTemplateHelper
                         wordIndex++;
                     }
 
+                        dialogues.Add(dialogue);
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(sentence.Text))
+                {
+                    if (effect != SyllableEffect.None) 
+                        throw new InvalidOperationException();
+                    string text = sentence.Text;
+
+                    Dialogue dialogue = new Dialogue()
+                    {
+                        Layer = 0,
+                        Start = sentence.Start,
+                        End = sentence.End,
+                        Style = Style.Name,
+                        Name = null,
+                        MarginL = 0,
+                        MarginR = 0,
+                        MarginV = 0,
+                        Effect = null,
+                    };
+                    dialogue.DialogueSyllableEffects.Add(new DialogueSyllableEffect()
+                    {
+                        Syllable = text,
+                        Effect = SyllableEffect.None,
+                    });
                     dialogues.Add(dialogue);
                 }
             }
