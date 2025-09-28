@@ -44,7 +44,7 @@ namespace TqkLibrary.AegisubTemplateHelper
                 }
             }
         }
-        public static IEnumerable<IEnumerable<IWord>> SplitWords(this IReadOnlyList<IWord> words, int line)
+        public static IEnumerable<IEnumerable<T>> SplitWords<T>(this IReadOnlyList<T> words, int line)
         {
             int wordCountPerLine = (int)Math.Ceiling(words.Count * 1.0 / line);
             for (int i = 0; i < line - 1; i++)
