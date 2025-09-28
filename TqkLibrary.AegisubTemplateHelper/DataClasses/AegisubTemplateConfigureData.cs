@@ -87,10 +87,10 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
         public virtual async Task<AdvancedConfigure?> GetForceConfigure()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
-            var forceConfigure = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));
-            if(!string.IsNullOrWhiteSpace(forceConfigure))
+            var line = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));
+            if (!string.IsNullOrWhiteSpace(line))
             {
-                var sub = forceConfigure.Substring($"{nameof(AdvancedConfigure)}:".Length).Trim();
+                var sub = line.Substring($"{nameof(AdvancedConfigure)}:".Length).Trim();
                 return JsonConvert.DeserializeObject<AdvancedConfigure>(sub);
             }
             return null;
