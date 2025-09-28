@@ -48,6 +48,9 @@ namespace TqkLibrary.AegisubTemplateHelper.DataClasses
 
         public virtual async Task<IEnumerable<string>> GetSubCommentsAsync()
         {
+            if (!FieldValues.Any())
+                await LoadFieldAsync();
+
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
             lines = lines
                 .Where(x => x.StartsWith("Comment"))//WARNING NEVER TRIM STRING
