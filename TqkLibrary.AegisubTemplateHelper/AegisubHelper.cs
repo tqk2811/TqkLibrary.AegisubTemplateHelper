@@ -98,6 +98,19 @@ namespace TqkLibrary.AegisubTemplateHelper
                         throw new InvalidOperationException();
                     string text = sentence.Text;
 
+                    using Bitmap bitmap = new(1, 1);
+                    using Graphics graphics = Graphics.FromImage(bitmap);
+                    using Font font = new Font(Style.Fontname, Style.Fontsize);
+                    var size = graphics.MeasureString(text, font);
+                    if (size.Width > MaxWidth)
+                    {
+                        int line = (int)Math.Ceiling(size.Width * 1.0 / MaxWidth);
+                        var str_words = sentence.Text.Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                        var lines = str_words.SplitWords(line);
+
+                        text = string.Join("\\n", lines.Select(x => string.Join(" ", x)));
+                    }
+
                     Dialogue dialogue = new Dialogue()
                     {
                         Layer = 0,
