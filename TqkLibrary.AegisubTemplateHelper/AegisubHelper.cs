@@ -20,7 +20,7 @@ namespace TqkLibrary.AegisubTemplateHelper
         public required AssStyleData Style { get; set; }
         public required AegisubTemplateConfigureData Template { get; set; }
 
-        public required int MaxWidth { get; set; }
+        public virtual int MaxWidth => ScriptInfo.VideoSize.Width - Style.MarginL - Style.MarginR;
         public double Speed { get; set; } = 1.0;
 
         public virtual async Task GenerateAssFileAsync()
