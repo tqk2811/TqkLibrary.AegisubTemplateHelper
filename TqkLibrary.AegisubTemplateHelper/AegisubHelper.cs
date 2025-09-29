@@ -108,7 +108,7 @@ namespace TqkLibrary.AegisubTemplateHelper
                         var str_words = sentence.Text.Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                         var lines = str_words.SplitWords(line);
 
-                        text = string.Join("\\n", lines.Select(x => string.Join(" ", x)));
+                        text = string.Join("\\N", lines.Select(x => string.Join(" ", x)));
                     }
 
                     Dialogue dialogue = new Dialogue()
