@@ -13,6 +13,7 @@ namespace TqkLibrary.AegisubTemplateHelper
 {
     public class AegisubHelper
     {
+        public required string AegisubDir { get; set; }
         public required IEnumerable<ISentence> Sentences { get; set; }
         public required string WorkingDir { get; set; }
         public required string GenerateOutputSubFilePath { get; set; }
@@ -149,12 +150,12 @@ namespace TqkLibrary.AegisubTemplateHelper
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo
             {
-                FileName = Path.Combine(Singleton.AegisubDir, "aegisub-cli.exe"),
+                FileName = Path.Combine(AegisubDir, "aegisub-cli.exe"),
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = Singleton.AegisubDir,
+                WorkingDirectory = AegisubDir,
             };
             processStartInfo.ArgumentList.Add("--automation");
             processStartInfo.ArgumentList.Add("kara-templater.lua");
