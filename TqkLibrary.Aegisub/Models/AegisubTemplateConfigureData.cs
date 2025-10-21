@@ -84,9 +84,9 @@ namespace TqkLibrary.Aegisub.Models
             return lines;
         }
 
-        public virtual async Task<AdvancedConfigure?> GetAdvancedConfigure()
+        public virtual async Task<AdvancedConfigure?> GetAdvancedConfigureAsync(CancellationToken cancellationToken = default)
         {
-            var lines = await File.ReadAllLinesAsync(TemplateFilePath);
+            var lines = await File.ReadAllLinesAsync(TemplateFilePath, cancellationToken);
             var line = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));
             if (!string.IsNullOrWhiteSpace(line))
             {

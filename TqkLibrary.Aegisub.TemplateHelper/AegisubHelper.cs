@@ -24,9 +24,9 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         public virtual int MaxWidth => ScriptInfo.VideoSize.Width - Style.MarginL - Style.MarginR;
         public double Speed { get; set; } = 1.0;
 
-        public virtual async Task GenerateAssFileAsync()
+        public virtual async Task GenerateAssFileAsync(CancellationToken cancellationToken = default)
         {
-            AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigure() ?? new();
+            AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigureAsync(cancellationToken) ?? new();
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
             List<Dialogue> dialogues = new List<Dialogue>();
