@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
-using TqkLibrary.AegisubTemplateHelper.DataClasses;
-using TqkLibrary.AegisubTemplateHelper.Interfaces;
+using TqkLibrary.Aegisub.TemplateHelper.DataClasses;
+using TqkLibrary.Aegisub.TemplateHelper.Interfaces;
 
-namespace TqkLibrary.AegisubTemplateHelper
+namespace TqkLibrary.Aegisub.TemplateHelper
 {
     public static class Extensions
     {
@@ -10,7 +10,7 @@ namespace TqkLibrary.AegisubTemplateHelper
         {
             return $"{timeSpan.Days * 24 + timeSpan.Hours}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}.{timeSpan.Milliseconds / 10:00}";
         }
-        public static string ToAssColor(this System.Drawing.Color color)
+        public static string ToAssColor(this Color color)
         {
             var r = $"{color.B.ToString("X2")}{color.G.ToString("X2")}{color.R.ToString("X2")}";
             return r;

@@ -1,4 +1,4 @@
-﻿namespace TqkLibrary.AegisubTemplateHelper.Interfaces
+﻿namespace TqkLibrary.Aegisub.TemplateHelper.Interfaces
 {
     public interface IWord : ITime
     {

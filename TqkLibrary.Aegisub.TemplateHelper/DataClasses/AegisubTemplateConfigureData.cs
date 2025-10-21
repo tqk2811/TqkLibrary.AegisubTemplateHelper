@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using TqkLibrary.AegisubTemplateHelper.JsonConverters;
+using TqkLibrary.Aegisub.TemplateHelper;
+using TqkLibrary.Aegisub.TemplateHelper.JsonConverters;
 
-namespace TqkLibrary.AegisubTemplateHelper.DataClasses
+namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
 {
     public class AegisubTemplateConfigureData
     {

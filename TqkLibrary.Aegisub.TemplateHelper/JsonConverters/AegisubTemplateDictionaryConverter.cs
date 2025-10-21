@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TqkLibrary.AegisubTemplateHelper.JsonConverters
+namespace TqkLibrary.Aegisub.TemplateHelper.JsonConverters
 {
     public class AegisubTemplateDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {
@@ -82,10 +82,10 @@ namespace TqkLibrary.AegisubTemplateHelper.JsonConverters
             {
                 uint abgr = uint.Parse(defaultValue.Length == 6 ? $"FF{defaultValue}" : defaultValue, System.Globalization.NumberStyles.HexNumber);
                 System.Drawing.Color color = System.Drawing.Color.FromArgb(
-                    (int)((abgr >> 24) & 0xFF),  // Alpha
+                    (int)(abgr >> 24 & 0xFF),  // Alpha
                     (int)(abgr & 0xFF),          // R
-                    (int)((abgr >> 8) & 0xFF),   // G
-                    (int)((abgr >> 16) & 0xFF)   // B
+                    (int)(abgr >> 8 & 0xFF),   // G
+                    (int)(abgr >> 16 & 0xFF)   // B
                 );
                 return color;
             }

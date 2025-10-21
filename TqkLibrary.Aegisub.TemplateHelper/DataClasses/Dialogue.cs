@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using TqkLibrary.Aegisub.TemplateHelper;
 
-namespace TqkLibrary.AegisubTemplateHelper.DataClasses
+namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
 {
     public class Dialogue
     {

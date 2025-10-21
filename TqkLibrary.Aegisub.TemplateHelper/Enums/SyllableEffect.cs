@@ -1,4 +1,4 @@
-﻿namespace TqkLibrary.AegisubTemplateHelper.Enums
+﻿namespace TqkLibrary.Aegisub.TemplateHelper.Enums
 {
     public enum SyllableEffect
     {

@@ -1,4 +1,4 @@
-﻿namespace TqkLibrary.AegisubTemplateHelper.DataClasses
+﻿namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
 {
     public static class AssEventData
     {

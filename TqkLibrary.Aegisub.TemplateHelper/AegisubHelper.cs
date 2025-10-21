@@ -5,11 +5,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TqkLibrary.AegisubTemplateHelper.DataClasses;
-using TqkLibrary.AegisubTemplateHelper.Enums;
-using TqkLibrary.AegisubTemplateHelper.Interfaces;
+using TqkLibrary.Aegisub.TemplateHelper.DataClasses;
+using TqkLibrary.Aegisub.TemplateHelper.Enums;
+using TqkLibrary.Aegisub.TemplateHelper.Interfaces;
 
-namespace TqkLibrary.AegisubTemplateHelper
+namespace TqkLibrary.Aegisub.TemplateHelper
 {
     public class AegisubHelper
     {
@@ -26,7 +26,7 @@ namespace TqkLibrary.AegisubTemplateHelper
 
         public virtual async Task GenerateAssFileAsync()
         {
-            AdvancedConfigure advancedConfigure = (await Template.GetForceConfigure()) ?? new();
+            AdvancedConfigure advancedConfigure = await Template.GetForceConfigure() ?? new();
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
             List<Dialogue> dialogues = new List<Dialogue>();
@@ -34,68 +34,68 @@ namespace TqkLibrary.AegisubTemplateHelper
             {
                 if (sentence.Words.Any())
                 {
-                var lines = sentence.SplitWords(Style, advancedConfigure.IsOneWordPerLine, MaxWidth)
-                    .Select(x => x.ToList())
-                    .Where(x => x.Any())
-                    .ToList();
-                var allWords = lines.SelectMany(x => x).ToList();
-                int wordIndex = 0;
-                for (int i = 0; i < lines.Count; i++)
-                {
-                    var words = lines[i];
+                    var lines = sentence.SplitWords(Style, advancedConfigure.IsOneWordPerLine, MaxWidth)
+                        .Select(x => x.ToList())
+                        .Where(x => x.Any())
+                        .ToList();
+                    var allWords = lines.SelectMany(x => x).ToList();
+                    int wordIndex = 0;
+                    for (int i = 0; i < lines.Count; i++)
+                    {
+                        var words = lines[i];
 
-                    TimeSpan start = words.First().Start;
-                    TimeSpan end = words.Last().End;
-                    if (Speed != 1.0)
-                    {
-                        start = start / Speed;
-                        end = end / Speed;
-                    }
-                    Dialogue dialogue = new Dialogue()
-                    {
-                        Layer = 0,
-                        Start = start,
-                        End = end,
-                        Style = Style.Name,
-                        Name = null,
-                        MarginL = 0,
-                        MarginR = 0,
-                        MarginV = 0,
-                        Effect = null,
-                    };
-
-                    for (int j = 0; j < words.Count; j++)
-                    {
-                        var current = words[j];
-                            DialogueSyllableEffect wordEffect = new()
+                        TimeSpan start = words.First().Start;
+                        TimeSpan end = words.Last().End;
+                        if (Speed != 1.0)
                         {
-                                Syllable = current.Word,
-                            WordTime = (current.End - current.Start) / Speed,
-                            Effect = effect
+                            start = start / Speed;
+                            end = end / Speed;
+                        }
+                        Dialogue dialogue = new Dialogue()
+                        {
+                            Layer = 0,
+                            Start = start,
+                            End = end,
+                            Style = Style.Name,
+                            Name = null,
+                            MarginL = 0,
+                            MarginR = 0,
+                            MarginV = 0,
+                            Effect = null,
                         };
-                            dialogue.DialogueSyllableEffects.Add(wordEffect);
 
-                        var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
-                        if (next is not null)
+                        for (int j = 0; j < words.Count; j++)
                         {
-                            //insert space
-                                DialogueSyllableEffect spaceEffect = new()
+                            var current = words[j];
+                            DialogueSyllableEffect wordEffect = new()
                             {
-                                    Syllable = " ",
-                                WordTime = (next.Start - current.End) / Speed,
+                                Syllable = current.Word,
+                                WordTime = (current.End - current.Start) / Speed,
                                 Effect = effect
                             };
+                            dialogue.DialogueSyllableEffects.Add(wordEffect);
+
+                            var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
+                            if (next is not null)
+                            {
+                                //insert space
+                                DialogueSyllableEffect spaceEffect = new()
+                                {
+                                    Syllable = " ",
+                                    WordTime = (next.Start - current.End) / Speed,
+                                    Effect = effect
+                                };
                                 dialogue.DialogueSyllableEffects.Add(spaceEffect);
+                            }
+                            wordIndex++;
                         }
-                        wordIndex++;
-                    }
 
                         dialogues.Add(dialogue);
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(sentence.Text))
                 {
-                    if (effect != SyllableEffect.None) 
+                    if (effect != SyllableEffect.None)
                         throw new InvalidOperationException();
                     string text = sentence.Text;
 
