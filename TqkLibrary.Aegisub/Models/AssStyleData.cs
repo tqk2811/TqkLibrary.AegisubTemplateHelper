@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using TqkLibrary.Aegisub.Enums;
 
-namespace TqkLibrary.Aegisub.DataClasses
+namespace TqkLibrary.Aegisub.Models
 {
     public class AssStyleData
     {

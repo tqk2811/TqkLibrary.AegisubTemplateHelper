@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using TqkLibrary.Aegisub.DataClasses;
+using TqkLibrary.Aegisub.Models;
 using TqkLibrary.Aegisub.Interfaces;
 
 namespace TqkLibrary.Aegisub.TemplateHelper

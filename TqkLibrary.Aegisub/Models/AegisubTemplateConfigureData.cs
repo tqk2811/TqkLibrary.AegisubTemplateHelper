@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using TqkLibrary.Aegisub.JsonConverters;
 
-namespace TqkLibrary.Aegisub.DataClasses
+namespace TqkLibrary.Aegisub.Models
 {
     public class AegisubTemplateConfigureData
     {
