@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TqkLibrary.Aegisub.TemplateHelper.DataClasses;
-using TqkLibrary.Aegisub.TemplateHelper.Enums;
-using TqkLibrary.Aegisub.TemplateHelper.Interfaces;
+using TqkLibrary.Aegisub.DataClasses;
+using TqkLibrary.Aegisub.Enums;
+using TqkLibrary.Aegisub.Interfaces;
 
 namespace TqkLibrary.Aegisub.TemplateHelper
 {
@@ -26,7 +26,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
 
         public virtual async Task GenerateAssFileAsync()
         {
-            AdvancedConfigure advancedConfigure = await Template.GetForceConfigure() ?? new();
+            AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigure() ?? new();
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
             List<Dialogue> dialogues = new List<Dialogue>();

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TqkLibrary.Aegisub.TemplateHelper.Interfaces
+namespace TqkLibrary.Aegisub.Interfaces
 {
     public interface ISentence : ITime
     {

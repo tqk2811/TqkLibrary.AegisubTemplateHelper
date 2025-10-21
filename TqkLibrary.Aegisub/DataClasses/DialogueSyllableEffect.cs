@@ -1,7 +1,7 @@
 ﻿using System;
-using TqkLibrary.Aegisub.TemplateHelper.Enums;
+using TqkLibrary.Aegisub.Enums;
 
-namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
+namespace TqkLibrary.Aegisub.DataClasses
 {
     public class DialogueSyllableEffect
     {

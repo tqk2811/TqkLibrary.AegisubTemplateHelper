@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36511.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TqkLibrary.Aegisub.TemplateHelper", "TqkLibrary.Aegisub.TemplateHelper\TqkLibrary.Aegisub.TemplateHelper.csproj", "{18ACC9AF-C793-09D3-BD24-1CD95DF65DE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TqkLibrary.Aegisub", "TqkLibrary.Aegisub\TqkLibrary.Aegisub.csproj", "{32C03379-F041-4120-B426-77580587281B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{18ACC9AF-C793-09D3-BD24-1CD95DF65DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18ACC9AF-C793-09D3-BD24-1CD95DF65DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18ACC9AF-C793-09D3-BD24-1CD95DF65DE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32C03379-F041-4120-B426-77580587281B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32C03379-F041-4120-B426-77580587281B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32C03379-F041-4120-B426-77580587281B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32C03379-F041-4120-B426-77580587281B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

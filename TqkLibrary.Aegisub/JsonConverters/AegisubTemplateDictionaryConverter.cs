@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TqkLibrary.Aegisub.TemplateHelper.JsonConverters
+namespace TqkLibrary.Aegisub.JsonConverters
 {
     public class AegisubTemplateDictionaryConverter : JsonConverter<Dictionary<string, object>>
     {

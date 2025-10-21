@@ -1,4 +1,4 @@
-﻿namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
+﻿namespace TqkLibrary.Aegisub.DataClasses
 {
     public class AdvancedConfigure
     {

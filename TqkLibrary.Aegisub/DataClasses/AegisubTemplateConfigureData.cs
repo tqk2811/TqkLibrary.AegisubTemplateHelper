@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using TqkLibrary.Aegisub.TemplateHelper;
-using TqkLibrary.Aegisub.TemplateHelper.JsonConverters;
+using TqkLibrary.Aegisub.JsonConverters;
 
-namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
+namespace TqkLibrary.Aegisub.DataClasses
 {
     public class AegisubTemplateConfigureData
     {
@@ -85,7 +84,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
             return lines;
         }
 
-        public virtual async Task<AdvancedConfigure?> GetForceConfigure()
+        public virtual async Task<AdvancedConfigure?> GetAdvancedConfigure()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
             var line = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));

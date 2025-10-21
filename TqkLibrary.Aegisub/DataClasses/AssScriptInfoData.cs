@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
-namespace TqkLibrary.Aegisub.TemplateHelper.DataClasses
+namespace TqkLibrary.Aegisub.DataClasses
 {
     public class AssScriptInfoData
     {

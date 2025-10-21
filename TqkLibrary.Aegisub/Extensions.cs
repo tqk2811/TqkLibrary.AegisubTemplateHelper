@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
-using TqkLibrary.Aegisub.TemplateHelper.DataClasses;
-using TqkLibrary.Aegisub.TemplateHelper.Interfaces;
+using TqkLibrary.Aegisub.DataClasses;
+using TqkLibrary.Aegisub.Interfaces;
 
-namespace TqkLibrary.Aegisub.TemplateHelper
+namespace TqkLibrary.Aegisub
 {
     public static class Extensions
     {
