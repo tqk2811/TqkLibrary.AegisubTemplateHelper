@@ -5,9 +5,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TqkLibrary.Aegisub.Models;
 using TqkLibrary.Aegisub.Enums;
+using TqkLibrary.Aegisub.Exceptions;
 using TqkLibrary.Aegisub.Interfaces;
+using TqkLibrary.Aegisub.Models;
 
 namespace TqkLibrary.Aegisub.TemplateHelper
 {
@@ -165,9 +166,21 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             using Process? process = Process.Start(processStartInfo);
             if (process is null)
                 throw new InvalidOperationException($"Can't start process aegisub-cli");
+            Task<string> t_stdout = process.StandardOutput.ReadToEndAsync();
+            Task<string> t_stderr = process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
             if (process.ExitCode != 0)
-                throw new Exception($"generate failed");
+            {
+                string stdout = await t_stdout;
+                string stderr = await t_stderr;
+
+                throw new AegisubProcessException()
+                {
+                    ExitCode = process.ExitCode,
+                    StdOut = stdout,
+                    StdErr = stderr
+                };
+            }
         }
 
     }
