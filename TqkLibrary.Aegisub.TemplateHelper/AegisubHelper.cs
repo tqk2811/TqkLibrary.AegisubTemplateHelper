@@ -152,8 +152,8 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             ProcessStartInfo processStartInfo = new ProcessStartInfo
             {
                 FileName = Path.Combine(AegisubDir, "aegisub-cli.exe"),
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = AegisubDir,
