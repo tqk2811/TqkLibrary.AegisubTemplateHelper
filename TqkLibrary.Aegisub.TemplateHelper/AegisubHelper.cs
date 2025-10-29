@@ -16,12 +16,11 @@ namespace TqkLibrary.Aegisub.TemplateHelper
     {
         public required string AegisubDir { get; set; }
         public required IEnumerable<ISentence> Sentences { get; set; }
-        public required string WorkingDir { get; set; }
+        public required string TempSubFilePath { get; set; }
         public required string GenerateOutputSubFilePath { get; set; }
         public required AssScriptInfoData ScriptInfo { get; set; }//video size
         public required AssStyleData Style { get; set; }
         public required AegisubTemplateConfigureData Template { get; set; }
-
         public virtual int MaxWidth => ScriptInfo.VideoSize.Width - Style.MarginL - Style.MarginR;
         public double Speed { get; set; } = 1.0;
 
@@ -134,8 +133,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                 }
             }
 
-            string tempSubPath = Path.Combine(WorkingDir, $"{Guid.NewGuid()}.ass");
-            using (StreamWriter streamWriter = new StreamWriter(tempSubPath, false, Encoding.UTF8))
+            using (StreamWriter streamWriter = new StreamWriter(TempSubFilePath, false, Encoding.UTF8))
             {
                 streamWriter.WriteLine(ScriptInfo);//[Script Info]
                 streamWriter.WriteLine();
@@ -160,7 +158,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             };
             processStartInfo.ArgumentList.Add("--automation");
             processStartInfo.ArgumentList.Add("kara-templater.lua");
-            processStartInfo.ArgumentList.Add(tempSubPath);
+            processStartInfo.ArgumentList.Add(TempSubFilePath);
             processStartInfo.ArgumentList.Add(GenerateOutputSubFilePath);
             processStartInfo.ArgumentList.Add("Apply karaoke template");
             using Process? process = Process.Start(processStartInfo);
