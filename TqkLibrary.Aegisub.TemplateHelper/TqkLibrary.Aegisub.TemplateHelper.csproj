@@ -5,14 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Update="AppData\**\*.*">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-
+	
 	<ItemGroup>
 	  <ProjectReference Include="..\TqkLibrary.Aegisub\TqkLibrary.Aegisub.csproj" />
 	</ItemGroup>
