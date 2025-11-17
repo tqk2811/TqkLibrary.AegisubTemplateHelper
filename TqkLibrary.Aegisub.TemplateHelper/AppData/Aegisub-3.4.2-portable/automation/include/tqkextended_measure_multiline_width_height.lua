@@ -16,27 +16,9 @@ local function split_literal(s, sep)
     return res
 end
 
--- tách từ dài thành nhiều phần theo usable_w (UTF-8 safe)
-local function split_long_word(style, word, usable_w)
-    local parts = {}
-    local cur = ""
-    for c in word:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
-        local test = cur .. c
-        local w,_ = aegisub.text_extents(style, test)
-        if w > usable_w and cur ~= "" then
-            table.insert(parts, cur)
-            cur = c
-        else
-            cur = test
-        end
-    end
-    if cur ~= "" then table.insert(parts, cur) end
-    return parts
-end
-
 -- xử lý line: nếu dài quá thì tách theo \n hoặc space
 local function splitSpaceOrN(text, style, maxwidth)
-    --aegisub.debug.out(0, "splitSpaceOrN: %s\n", text)
+    --aegisub.debug.out(0, "splitSpaceOrN: %s", text)
     local chunks = {}
     local softbreaks = {}
 
@@ -61,15 +43,14 @@ local function splitSpaceOrN(text, style, maxwidth)
 
     local linebuf = ""
     local i = 1
-while i <= #text do
+    while i <= #text do
         local next_space = string.find(text, " ", i, true)
-        local next_chunk_end
-
-        if next_space then
-            next_chunk_end = next_space
-        else
-            next_chunk_end = #text + 1
+        if next_space == i then
+            -- skip space
+            i = i + 1
+            goto continue
         end
+        local next_chunk_end = next_space and next_space or (#text + 1)
 
         local chunk = string.sub(text, i, next_chunk_end - 1)
         local newbuf = (linebuf == "") and chunk or (linebuf .. " " .. chunk)
@@ -100,6 +81,7 @@ while i <= #text do
             linebuf = newbuf
             i = next_chunk_end
         end
+        ::continue::
     end
 
     -- đẩy phần cuối vào
