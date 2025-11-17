@@ -35,90 +35,79 @@ local function split_long_word(style, word, usable_w)
 end
 
 -- xử lý line: nếu dài quá thì tách theo \n hoặc space
-local function splitSpaceOrN(style, text, usable_w)
+local function splitSpaceOrN(text, style, maxwidth)
     --aegisub.debug.out(0, "splitSpaceOrN: %s\n", text)
-    local lines = { text }
-    local changed = true
+    local chunks = {}
+    local softbreaks = {}
 
-    while changed do
-        changed = false
-        for i = 1, #lines do
-            local cur = lines[i]
-            local w,_ = aegisub.text_extents(style, cur)
-            if w > usable_w then
-                -- nếu có \n -> tách tại \n đầu tiên
-                local s,e = string.find(cur, "\\n", 1, true)
-                if s then
-                    local left = string.sub(cur, 1, s - 1)
-                    local right = string.sub(cur, e + 1)
-                    local newlines = {}
-                    for j = 1, i - 1 do table.insert(newlines, lines[j]) end
-                    table.insert(newlines, left)
-                    table.insert(newlines, right)
-                    for j = i + 1, #lines do table.insert(newlines, lines[j]) end
-                    lines = newlines
-                    changed = true
-                    break
-                else
-                    -- không có \n, chia theo số từ
-                    local size_w,_ = aegisub.text_extents(style, cur)
-                    local numLines = math.ceil(size_w / usable_w)
-                    if numLines < 2 then numLines = 2 end
-
-                    local words = {}
-                    for word in cur:gmatch("%S+") do table.insert(words, word) end
-
-                    if #words == 0 then
-                        -- toàn khoảng trắng, chia đôi
-                        local len = #cur
-                        local mid = math.floor(len / 2)
-                        local left = string.sub(cur, 1, mid)
-                        local right = string.sub(cur, mid + 1)
-                        local newlines = {}
-                        for j = 1, i - 1 do table.insert(newlines, lines[j]) end
-                        table.insert(newlines, left)
-                        table.insert(newlines, right)
-                        for j = i + 1, #lines do table.insert(newlines, lines[j]) end
-                        lines = newlines
-                        changed = true
-                        break
-                    end
-
-                    if #words == 1 then
-                        -- một từ dài -> tách ký tự
-                        local parts = split_long_word(style, words[1], usable_w)
-                        local newlines = {}
-                        for j = 1, i - 1 do table.insert(newlines, lines[j]) end
-                        for _, p in ipairs(parts) do table.insert(newlines, p) end
-                        for j = i + 1, #lines do table.insert(newlines, lines[j]) end
-                        lines = newlines
-                        changed = true
-                        break
-                    else
-                        local wordCountPerLine = math.ceil(#words / numLines)
-                        local newparts = {}
-                        local idx = 1
-                        while idx <= #words do
-                            local to = math.min(idx + wordCountPerLine - 1, #words)
-                            local chunk = {}
-                            for k = idx, to do table.insert(chunk, words[k]) end
-                            table.insert(newparts, table.concat(chunk, " "))
-                            idx = to + 1
-                        end
-                        local newlines = {}
-                        for j = 1, i - 1 do table.insert(newlines, lines[j]) end
-                        for _, p in ipairs(newparts) do table.insert(newlines, p) end
-                        for j = i + 1, #lines do table.insert(newlines, lines[j]) end
-                        lines = newlines
-                        changed = true
-                        break
-                    end
-                end
-            end
+    do
+        local pos = 1
+        while true do
+            local s, e = string.find(text, "\\n", pos, true)
+            if not s then break end
+            table.insert(softbreaks, s)
+            pos = e + 1
         end
     end
 
-    return lines
+    local function has_softbreak_before(i)
+        for _, sb in ipairs(softbreaks) do
+            if sb < i then
+                return sb
+            end
+        end
+        return nil
+    end
+
+    local linebuf = ""
+    local i = 1
+while i <= #text do
+        local next_space = string.find(text, " ", i, true)
+        local next_chunk_end
+
+        if next_space then
+            next_chunk_end = next_space
+        else
+            next_chunk_end = #text + 1
+        end
+
+        local chunk = string.sub(text, i, next_chunk_end - 1)
+        local newbuf = (linebuf == "") and chunk or (linebuf .. " " .. chunk)
+
+        local w = aegisub.text_extents(style, newbuf)
+
+        if w > maxwidth then
+            local sb = has_softbreak_before(i)
+            if sb then
+                local left = string.sub(text, 1, sb - 1)
+                local right = string.sub(text, sb + 2)
+                table.insert(chunks, left)
+                return merge(chunks, splitSpaceOrN(right, style, maxwidth))
+            end
+
+            -- nếu KHÔNG có soft-break → wrap theo từ (giống code cũ)
+            if linebuf == "" then
+                -- chunk quá to => buộc tách ký tự
+                table.insert(chunks, chunk)
+                i = next_chunk_end
+            else
+                table.insert(chunks, linebuf)
+                linebuf = chunk
+                i = next_chunk_end
+            end
+        else
+            -- không overflow => nối chunk
+            linebuf = newbuf
+            i = next_chunk_end
+        end
+    end
+
+    -- đẩy phần cuối vào
+    if linebuf ~= "" then
+        table.insert(chunks, linebuf)
+    end
+
+    return chunks
 end
 
 -- filter chính
@@ -137,7 +126,7 @@ function M.measure_multiline_width_height_filter(meta, styles, subs)
                 local hard_blocks = split_literal(line.text, "\\N")
                 local lines_final = {}
                 for _, blk in ipairs(hard_blocks) do
-                    local parts = splitSpaceOrN(style, blk, usable_w)
+                    local parts = splitSpaceOrN(blk, style, usable_w)
                     for _, p in ipairs(parts) do table.insert(lines_final, p) end
                 end
 
