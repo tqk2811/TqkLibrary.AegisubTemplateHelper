@@ -4,7 +4,7 @@ using TqkLibrary.Aegisub.Interfaces;
 
 namespace TqkLibrary.Aegisub.TemplateHelper
 {
-    public static class Extensions
+    public static class AegisubExtensions
     {
         public static IEnumerable<IEnumerable<IWord>> SplitWords(this ISentence sentence, AssStyleData style, bool IsOneWordPerLine, int maxWidth)
         {
