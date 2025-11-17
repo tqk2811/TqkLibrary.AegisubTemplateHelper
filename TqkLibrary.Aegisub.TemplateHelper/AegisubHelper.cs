@@ -22,6 +22,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         public required AssStyleData Style { get; set; }
         public required AegisubTemplateConfigureData Template { get; set; }
         public virtual int MaxWidth => ScriptInfo.VideoSize.Width - Style.MarginL - Style.MarginR;
+        public bool IsAllowSplitLine { get; set; } = false;
         public double Speed { get; set; } = 1.0;
 
         public virtual async Task GenerateAssFileAsync(CancellationToken cancellationToken = default)
@@ -40,12 +41,65 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                         .ToList();
                     var allWords = lines.SelectMany(x => x).ToList();
                     int wordIndex = 0;
-                    for (int i = 0; i < lines.Count; i++)
+                    if (IsAllowSplitLine || advancedConfigure.IsOneWordPerLine)
                     {
-                        var words = lines[i];
+                        for (int i = 0; i < lines.Count; i++)
+                        {
+                            var words = lines[i];
 
-                        TimeSpan start = words.First().Start;
-                        TimeSpan end = words.Last().End;
+                            TimeSpan start = words.First().Start;
+                            TimeSpan end = words.Last().End;
+                            if (Speed != 1.0)
+                            {
+                                start = start / Speed;
+                                end = end / Speed;
+                            }
+                            Dialogue dialogue = new Dialogue()
+                            {
+                                Layer = 0,
+                                Start = start,
+                                End = end,
+                                Style = Style.Name,
+                                Name = null,
+                                MarginL = 0,
+                                MarginR = 0,
+                                MarginV = 0,
+                                Effect = null,
+                            };
+
+                            for (int j = 0; j < words.Count; j++)
+                            {
+                                var current = words[j];
+                                DialogueSyllableEffect wordEffect = new()
+                                {
+                                    Syllable = current.Word,
+                                    WordTime = (current.End - current.Start) / Speed,
+                                    Effect = effect
+                                };
+                                dialogue.DialogueSyllableEffects.Add(wordEffect);
+
+                                var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
+                                if (next is not null)
+                                {
+                                    //insert space
+                                    DialogueSyllableEffect spaceEffect = new()
+                                    {
+                                        Syllable = " ",
+                                        WordTime = (next.Start - current.End) / Speed,
+                                        Effect = effect
+                                    };
+                                    dialogue.DialogueSyllableEffects.Add(spaceEffect);
+                                }
+                                wordIndex++;
+                            }
+
+                            dialogues.Add(dialogue);
+                        }
+                    }
+                    else
+                    {
+                        TimeSpan start = lines.First().First().Start;
+                        TimeSpan end = lines.Last().Last().End;
                         if (Speed != 1.0)
                         {
                             start = start / Speed;
@@ -63,31 +117,58 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                             MarginV = 0,
                             Effect = null,
                         };
-
-                        for (int j = 0; j < words.Count; j++)
+                        for (int i = 0; i < lines.Count; i++)
                         {
-                            var current = words[j];
-                            DialogueSyllableEffect wordEffect = new()
+                            var words = lines[i];
+                            for (int j = 0; j < words.Count; j++)
                             {
-                                Syllable = current.Word,
-                                WordTime = (current.End - current.Start) / Speed,
-                                Effect = effect
-                            };
-                            dialogue.DialogueSyllableEffects.Add(wordEffect);
+                                var current = words[j];
+                                var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
+                                var nextInLine = words.Skip(j + 1).FirstOrDefault();
 
-                            var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
-                            if (next is not null)
-                            {
-                                //insert space
-                                DialogueSyllableEffect spaceEffect = new()
+                                DialogueSyllableEffect wordEffect = new()
                                 {
-                                    Syllable = " ",
-                                    WordTime = (next.Start - current.End) / Speed,
+                                    Syllable = current.Word,
+                                    WordTime = (current.End - current.Start) / Speed,
                                     Effect = effect
                                 };
-                                dialogue.DialogueSyllableEffects.Add(spaceEffect);
+                                dialogue.DialogueSyllableEffects.Add(wordEffect);
+
+                                if(nextInLine is not null)
+                                {
+                                    //insert space
+                                    DialogueSyllableEffect spaceEffect = new()
+                                    {
+                                        Syllable = " ",
+                                        WordTime = (nextInLine.Start - current.End) / Speed,
+                                        Effect = effect
+                                    };
+                                    dialogue.DialogueSyllableEffects.Add(spaceEffect);
+                                }
+                                else
+                                {
+                                    if (next is not null)
+                                    {
+                                        DialogueSyllableEffect beforeLineBreakEffect = new()
+                                        {
+                                            Syllable = " ",
+                                            WordTime = (next.Start - current.End) / Speed,
+                                            Effect = effect
+                                        };
+                                        dialogue.DialogueSyllableEffects.Add(beforeLineBreakEffect);
+
+                                        //line break
+                                        DialogueSyllableEffect lineBreakEffect = new()
+                                        {
+                                            Syllable = "\\N",
+                                            Effect = SyllableEffect.None,
+                                        };
+                                        dialogue.DialogueSyllableEffects.Add(lineBreakEffect);
+                                    }
+                                }
+
+                                wordIndex++;
                             }
-                            wordIndex++;
                         }
 
                         dialogues.Add(dialogue);
