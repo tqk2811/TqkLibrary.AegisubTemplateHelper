@@ -14,7 +14,7 @@ namespace TqkLibrary.Aegisub.Models
 
 
 
-        static readonly Regex regex = new Regex("\\[([A-z0-9]+),([A-z0-9]+)\\]");
+        static readonly Regex regex = new Regex("\\[([A-z0-9]+);([A-z0-9]+)\\]");
         public virtual async Task LoadFieldAsync()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
@@ -76,7 +76,7 @@ namespace TqkLibrary.Aegisub.Models
                             replaced = item.Value.ToString()!;
                         }
 
-                        line = Regex.Replace(line, $"\\[{Regex.Escape(item.Key)},([A-z0-9]+)\\]", replaced);
+                        line = Regex.Replace(line, $"\\[{Regex.Escape(item.Key)};([A-z0-9]+)\\]", replaced);
                     }
                     return line;
                 })

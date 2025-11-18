@@ -30,6 +30,8 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigureAsync(cancellationToken) ?? new();
             SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
+
+
             List<Dialogue> dialogues = new List<Dialogue>();
             foreach (ISentence sentence in Sentences)
             {
@@ -134,7 +136,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                                 };
                                 dialogue.DialogueSyllableEffects.Add(wordEffect);
 
-                                if(nextInLine is not null)
+                                if (nextInLine is not null)
                                 {
                                     //insert space
                                     DialogueSyllableEffect spaceEffect = new()

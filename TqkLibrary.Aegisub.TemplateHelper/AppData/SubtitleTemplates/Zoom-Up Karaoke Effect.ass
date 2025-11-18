@@ -1,9 +1,9 @@
 ﻿AdvancedConfigure: { "IsOneWordPerLine": false, "IsUseSyl": true }
 ;nền
-Comment: 0,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("line",0,0)!{\an5\pos($center,$middle)\blur[BlurSizeInt,8]\bord[BordSizeInt,8]\3c&H[BackgroundBlurColour,008800]&\1c&H[BackgroundBlurColour,008800]&\alpha&H80&}
+Comment: 0,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("line",0,0)!{\an5\pos($center,$middle)\blur[BlurSizeInt;8]\bord[BordSizeInt;8]\3c&H[BackgroundBlurColour;008800]&\1c&H[BackgroundBlurColour;008800]&\alpha&H80&}
 ;start
 Comment: 1,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("start2syl",0,0)!{\an5\pos($center,$middle)}
 ;phóng to đổi màu
-Comment: 2,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("syl",0,0)!{\an5\pos($center,$middle)\c&H[ZoomColour,00FF00]&\t(0,100\fscx[ZoomPercentInt,150]\fscy[ZoomPercentInt,150])\t(100,$dur,\fscx100\fscy100)}
+Comment: 2,0:00:00.00,0:00:00.00,Default,,0,0,0,template syl noblank,!retime("syl",0,0)!{\an5\pos($center,$middle)\c&H[ZoomColour;00FF00]&\t(0,100\fscx[ZoomPercentInt;150]\fscy[ZoomPercentInt;150])\t(100,$dur,\fscx100\fscy100)}
 ;end
 Comment: 1,0:00:00.10,0:00:05.00,Default,,0,0,0,template syl noblank,!retime("syl2end",0,0)!{\an5\pos($center,$middle)\fad(0,050)}
