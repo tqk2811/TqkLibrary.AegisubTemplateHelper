@@ -60,7 +60,7 @@ namespace TqkLibrary.Aegisub.Models
                     nameof(MarginV),
                     nameof(Encoding),
                 };
-                return $"Format: {string.Join(", ", formatParts)}";
+                return $"[V4+ Styles]\r\nFormat: {string.Join(", ", formatParts)}";
             }
         }
 
@@ -100,9 +100,7 @@ namespace TqkLibrary.Aegisub.Models
         }
         public override string ToString()
         {
-            return $@"[V4+ Styles]
-{Format}
-{Style}";
+            return Style;
         }
     }
 }

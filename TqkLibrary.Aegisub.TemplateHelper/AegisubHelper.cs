@@ -218,7 +218,8 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             {
                 streamWriter.WriteLine(ScriptInfo);//[Script Info]
                 streamWriter.WriteLine();
-                streamWriter.WriteLine(Style);//[V4+ Styles]
+                streamWriter.WriteLine(AssStyleData.Format);//[V4+ Styles]
+                streamWriter.WriteLine(Style.Style);
                 streamWriter.WriteLine();
                 streamWriter.WriteLine(AssEventData.Event);//[Events]
                 foreach (var line in await Template.GetSubCommentsAsync())
