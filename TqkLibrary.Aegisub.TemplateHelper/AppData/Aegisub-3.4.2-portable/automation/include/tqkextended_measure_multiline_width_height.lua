@@ -36,7 +36,7 @@ end
 
 -- xử lý line: nếu dài quá thì tách theo \n hoặc space
 local function splitSpaceOrN(style, text, usable_w)
-    --aegisub.debug.out(0, "splitSpaceOrN: %s\n", text)
+    aegisub.debug.out(0, "splitSpaceOrN: %s\n", text)
     local lines = { text }
     local changed = true
 
