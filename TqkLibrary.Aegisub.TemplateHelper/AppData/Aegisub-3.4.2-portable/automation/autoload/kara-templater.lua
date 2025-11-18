@@ -819,7 +819,6 @@ function apply_one_syllable_template(syl, line, template, tenv, varctx, subs, sk
 	return applied
 end
 
-include("tqkextended.lua")
 
 -- Main function to do the templating
 function filter_apply_templates(subs, config)
@@ -828,9 +827,6 @@ function filter_apply_templates(subs, config)
 
 	aegisub.progress.task("Parsing templates...")
 	local templates = parse_templates(meta, styles, subs)
-	
-	aegisub.progress.task("tqk_extended_filter...")
-	tqk_extended_filter(meta, styles, subs)
 
 	aegisub.progress.task("Applying templates...")
 	apply_templates(meta, styles, subs, templates)
