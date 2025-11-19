@@ -5,28 +5,8 @@ using TqkLibrary.Aegisub.Models;
 
 namespace TqkLibrary.Aegisub.TemplateHelper
 {
-    public static class AegisubExtensions
+    public static class AegisubTemplateExtensions
     {
-        public static AegisubWord Clone(this IAegisubWord aegisubWord)
-            => new AegisubWord()
-            {
-                Start = aegisubWord.Start,
-                End = aegisubWord.End,
-                Word = aegisubWord.Word,
-            };
-        public static IEnumerable<AegisubWord> Clone(this IEnumerable<IAegisubWord> aegisubWords)
-            => aegisubWords.Select(x => x.Clone());
-        public static AegisubSentence Clone(this IAegisubSentence aegisubSentence)
-            => new AegisubSentence()
-            {
-                Start = aegisubSentence.Start,
-                End = aegisubSentence.End,
-                Text = aegisubSentence.Text,
-                Words = aegisubSentence.Words.Clone().ToList(),
-            };
-
-
-
         [SupportedOSPlatform("windows")]
         public static IEnumerable<IAegisubSentence> SplitWords(this IAegisubSentence sentence, FontMeasurer fontMeasurer, int maxWidth)
         {
