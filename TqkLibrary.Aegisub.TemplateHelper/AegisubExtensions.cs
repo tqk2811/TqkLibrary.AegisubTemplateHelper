@@ -7,6 +7,26 @@ namespace TqkLibrary.Aegisub.TemplateHelper
 {
     public static class AegisubExtensions
     {
+        public static AegisubWord Clone(this IAegisubWord aegisubWord)
+            => new AegisubWord()
+            {
+                Start = aegisubWord.Start,
+                End = aegisubWord.End,
+                Word = aegisubWord.Word,
+            };
+        public static IEnumerable<AegisubWord> Clone(this IEnumerable<IAegisubWord> aegisubWords)
+            => aegisubWords.Select(x => x.Clone());
+        public static AegisubSentence Clone(this IAegisubSentence aegisubSentence)
+            => new AegisubSentence()
+            {
+                Start = aegisubSentence.Start,
+                End = aegisubSentence.End,
+                Text = aegisubSentence.Text,
+                Words = aegisubSentence.Words.Clone().ToList(),
+            };
+
+
+
         [SupportedOSPlatform("windows")]
         public static IEnumerable<IAegisubSentence> SplitWords(this IAegisubSentence sentence, FontMeasurer fontMeasurer, int maxWidth)
         {
@@ -21,7 +41,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             int wasTakeCount = 0;
             for (int i = 0; i < sentence.Words.Count && wasTakeCount < sentence.Words.Count; i++)
             {
-                if (i < wasTakeCount) 
+                if (i < wasTakeCount)
                     continue;
                 var takewords = sentence.Words.Skip(wasTakeCount).Take(i - wasTakeCount + 1).ToList();
                 string text = string.Join(" ", takewords);
@@ -38,7 +58,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                     {
                         Start = sentence.Words.First().Start,
                         End = sentence.Words.Last().End,
-                        Words = wordsList,
+                        Words = wordsList.Clone().ToList(),
                         Text = string.Join(" ", wordsList.Select(x => x.Word))
                     };
                     if (isFullyWithOneWord) wasTakeCount = i + 1;
