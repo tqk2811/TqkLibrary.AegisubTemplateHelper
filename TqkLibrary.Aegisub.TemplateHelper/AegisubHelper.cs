@@ -39,7 +39,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                         Start = x.Start,
                         End = x.End,
                         Text = x.Word,
-                        Words = [new AegisubWord() { Word = x.Word, Start = x.Start, End = x.End }],
+                        Words = [x.Clone()],
                     });
 
             using FontMeasurer fontMeasurer = new FontMeasurer(Style);
