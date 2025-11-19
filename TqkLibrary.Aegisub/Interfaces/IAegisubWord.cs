@@ -1,6 +1,6 @@
 ﻿namespace TqkLibrary.Aegisub.Interfaces
 {
-    public interface IWord : ITime
+    public interface IAegisubWord : IAegisubTime
     {
         string Word { get; }
     }

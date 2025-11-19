@@ -16,7 +16,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
     public class AegisubHelper
     {
         public required string AegisubDir { get; set; }
-        public required IEnumerable<ISentence> Sentences { get; set; }
+        public required IEnumerable<IAegisubSentence> Sentences { get; set; }
         public required string TempSubFilePath { get; set; }
         public required string GenerateOutputSubFilePath { get; set; }
         public required AssScriptInfoData ScriptInfo { get; set; }//video size
@@ -30,7 +30,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         {
             AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigureAsync(cancellationToken) ?? new();
 
-            IEnumerable<ISentence> sentences = Sentences;
+            IEnumerable<IAegisubSentence> sentences = Sentences;
             if (advancedConfigure.IsOneWordPerLine)
                 sentences = sentences
                     .SelectMany(x => x.Words)
@@ -45,22 +45,22 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             using FontMeasurer fontMeasurer = new FontMeasurer(Style);
 
             List<Dialogue> dialogues = new List<Dialogue>();
-            foreach (ISentence sentence in sentences)
+            foreach (IAegisubSentence sentence in sentences)
                 dialogues.AddRange(ResolveTextOverflow(sentence, advancedConfigure, fontMeasurer));
 
             await RunGenerateAssFileAsync(dialogues, cancellationToken);
         }
 
         [SupportedOSPlatform("windows")]
-        protected virtual IEnumerable<Dialogue> ResolveTextOverflow(ISentence sentence, AdvancedConfigure advancedConfigure, FontMeasurer fontMeasurer)
+        protected virtual IEnumerable<Dialogue> ResolveTextOverflow(IAegisubSentence sentence, AdvancedConfigure advancedConfigure, FontMeasurer fontMeasurer)
         {
             if (IsAllowSplitLine)
             {
-                if (sentence.Text.Contains("\n")) throw new InvalidOperationException($"{nameof(ISentence.Text)} must not contains line break");
+                if (sentence.Text.Contains("\n")) throw new InvalidOperationException($"{nameof(IAegisubSentence.Text)} must not contains line break");
                 if (!AnchorPoint.HasValue) throw new InvalidOperationException($"{nameof(AnchorPoint)} must have value for split text");
 
                 int maxWidth = Style.GetMaxWidth(ScriptInfo.VideoSize.Width);
-                List<ISentence> splitSentences = sentence.SplitWords(fontMeasurer, maxWidth).ToList();
+                List<IAegisubSentence> splitSentences = sentence.SplitWords(fontMeasurer, maxWidth).ToList();
                 int lineCount = splitSentences.Count;
                 float lineHeight = fontMeasurer.MeasureString(sentence.Text).Height;
                 List<Point> AnchorPoints = new(lineCount);
@@ -157,7 +157,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         }
 
 
-        protected virtual Dialogue GenDialogue(ISentence sentence, bool isUseSyl, Point? pos = null)
+        protected virtual Dialogue GenDialogue(IAegisubSentence sentence, bool isUseSyl, Point? pos = null)
         {
             Dialogue dialogue = new Dialogue()
             {
@@ -175,7 +175,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             if (isUseSyl)
             {
                 if (!sentence.Words.Any())
-                    throw new InvalidOperationException($"When use syl {nameof(ISentence)}.{nameof(sentence.Words)} must have values");
+                    throw new InvalidOperationException($"When use syl {nameof(IAegisubSentence)}.{nameof(sentence.Words)} must have values");
 
                 for (int j = 0; j < sentence.Words.Count; j++)
                 {
@@ -205,7 +205,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             else
             {
                 if (string.IsNullOrWhiteSpace(sentence.Text))
-                    throw new InvalidOperationException($"When not use syl, {nameof(ISentence)}.{nameof(sentence.Text)} must have value");
+                    throw new InvalidOperationException($"When not use syl, {nameof(IAegisubSentence)}.{nameof(sentence.Text)} must have value");
                 dialogue.DialogueSyllableEffects.Add(new DialogueSyllableEffect()
                 {
                     Syllable = sentence.Text,

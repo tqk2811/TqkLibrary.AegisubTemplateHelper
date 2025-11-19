@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TqkLibrary.Aegisub.Interfaces
 {
-    public interface ISentence : ITime, IWordList
+    public interface IAegisubSentence : IAegisubTime, IAegisubWordList
     {
         string Text { get; }
     }

@@ -8,7 +8,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
     public static class AegisubExtensions
     {
         [SupportedOSPlatform("windows")]
-        public static IEnumerable<ISentence> SplitWords(this ISentence sentence, FontMeasurer fontMeasurer, int maxWidth)
+        public static IEnumerable<IAegisubSentence> SplitWords(this IAegisubSentence sentence, FontMeasurer fontMeasurer, int maxWidth)
         {
             {
                 var size = fontMeasurer.MeasureString(sentence.Text);

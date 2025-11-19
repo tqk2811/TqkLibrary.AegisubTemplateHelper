@@ -2,9 +2,13 @@
 
 namespace TqkLibrary.Aegisub.Models
 {
-    public class AegisubSentence : AegisubWordList, ISentence
+    public class AegisubSentence : AegisubWordList, IAegisubSentence
     {
         public required string Text { get; set; }
-        IReadOnlyList<IWord> IWordList.Words => Words;
+        IReadOnlyList<IAegisubWord> IAegisubWordList.Words => Words;
+        public override string ToString()
+        {
+            return $"{Start:hh\\:mm\\:ss\\.fff} - {End:hh\\:mm\\:ss\\.fff}: {Text}";
+        }
     }
 }

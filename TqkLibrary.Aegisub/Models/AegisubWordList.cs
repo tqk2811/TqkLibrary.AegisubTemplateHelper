@@ -2,9 +2,9 @@
 
 namespace TqkLibrary.Aegisub.Models
 {
-    public class AegisubWordList : AegisubTime, IWordList
+    public class AegisubWordList : AegisubTime, IAegisubWordList
     {
-        public required List<IWord> Words { get; set; }
-        IReadOnlyList<IWord> IWordList.Words => Words;
+        public required List<IAegisubWord> Words { get; set; }
+        IReadOnlyList<IAegisubWord> IAegisubWordList.Words => Words;
     }
 }
