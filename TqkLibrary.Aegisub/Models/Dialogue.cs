@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using TqkLibrary.Aegisub.Enums;
 
 namespace TqkLibrary.Aegisub.Models
 {
@@ -14,7 +16,30 @@ namespace TqkLibrary.Aegisub.Models
         public int MarginR { get; set; } = 0;
         public int MarginV { get; set; } = 0;
         public string? Effect { get; set; }
-        public string Text => string.Join(string.Empty, DialogueSyllableEffects);
+        public string Text
+        {
+            get
+            {
+                string result = string.Join(string.Empty, DialogueSyllableEffects);
+                List<string> tags = new();
+                if (Pos.HasValue)
+                {
+                    tags.Add($"\\pos({Pos.Value.X},{Pos.Value.Y})");
+                }
+                if (Alignment.HasValue)
+                {
+                    tags.Add($"\\an{(int)Alignment}");
+                }
+                if (tags.Any())
+                {
+                    result = $" {{{string.Join(string.Empty, tags)}}}{result}";
+                }
+                return result;
+            }
+        }
+
+        public Point? Pos { get; set; }
+        public Alignment? Alignment { get; set; }
 
         public List<DialogueSyllableEffect> DialogueSyllableEffects { get; } = new();
 

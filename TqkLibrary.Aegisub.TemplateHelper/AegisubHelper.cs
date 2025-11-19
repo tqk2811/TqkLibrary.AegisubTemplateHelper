@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using TqkLibrary.Aegisub.Enums;
@@ -19,203 +20,90 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         public required string TempSubFilePath { get; set; }
         public required string GenerateOutputSubFilePath { get; set; }
         public required AssScriptInfoData ScriptInfo { get; set; }//video size
-        public required AssStyleData Style { get; set; }
+        public required AssStyleData Style { get; set; }//mỗi style một line
         public required AegisubTemplateConfigureData Template { get; set; }
-        public virtual int MaxWidth => ScriptInfo.VideoSize.Width - Style.MarginL - Style.MarginR;
         public bool IsAllowSplitLine { get; set; } = false;
-        public double Speed { get; set; } = 1.0;
+        public Point? AnchorPoint { get; set; }
 
+        [SupportedOSPlatform("windows")]
         public virtual async Task GenerateAssFileAsync(CancellationToken cancellationToken = default)
         {
             AdvancedConfigure advancedConfigure = await Template.GetAdvancedConfigureAsync(cancellationToken) ?? new();
-            SyllableEffect effect = advancedConfigure.IsUseSyl ? SyllableEffect.k : SyllableEffect.None;
 
+            IEnumerable<ISentence> sentences = Sentences;
+            if (advancedConfigure.IsOneWordPerLine)
+                sentences = sentences
+                    .SelectMany(x => x.Words)
+                    .Select(x => new AegisubSentence()
+                    {
+                        Start = x.Start,
+                        End = x.End,
+                        Text = x.Word,
+                        Words = [x],
+                    });
 
+            using FontMeasurer fontMeasurer = new FontMeasurer(Style);
 
             List<Dialogue> dialogues = new List<Dialogue>();
-            foreach (ISentence sentence in Sentences)
+            foreach (ISentence sentence in sentences)
+                dialogues.AddRange(ResolveTextOverflow(sentence, advancedConfigure, fontMeasurer));
+
+            await RunGenerateAssFileAsync(dialogues, cancellationToken);
+        }
+
+        [SupportedOSPlatform("windows")]
+        protected virtual IEnumerable<Dialogue> ResolveTextOverflow(ISentence sentence, AdvancedConfigure advancedConfigure, FontMeasurer fontMeasurer)
+        {
+            if (IsAllowSplitLine)
             {
-                if (sentence.Words.Any())
+                if (sentence.Text.Contains("\n")) throw new InvalidOperationException($"{nameof(ISentence.Text)} must not contains line break");
+                if (!AnchorPoint.HasValue) throw new InvalidOperationException($"{nameof(AnchorPoint)} must have value for split text");
+
+                int maxWidth = Style.GetMaxWidth(ScriptInfo.VideoSize.Width);
+                List<ISentence> splitSentences = sentence.SplitWords(fontMeasurer, maxWidth).ToList();
+                int lineCount = splitSentences.Count;
+                float lineHeight = fontMeasurer.MeasureString(sentence.Text).Height;
+                List<Point> AnchorPoints = new(lineCount);
+
+                int vertical = ((int)Style.Alignment - 1) / 3;//0 bottom, 1 mid, 2 top
+                //int horizontal = ((int)Style.Alignment - 1) % 3;//0 left, 1 center, 2 right
+
+                for (int i = 0; i < lineCount; i++)
                 {
-                    var lines = sentence.SplitWords(Style, advancedConfigure.IsOneWordPerLine, MaxWidth)
-                        .Select(x => x.ToList())
-                        .Where(x => x.Any())
-                        .ToList();
-                    var allWords = lines.SelectMany(x => x).ToList();
-                    int wordIndex = 0;
-                    if (IsAllowSplitLine || advancedConfigure.IsOneWordPerLine)
+                    float yOffset = 0;
+                    if (lineCount > 1)
                     {
-                        for (int i = 0; i < lines.Count; i++)
+                        switch (vertical)
                         {
-                            var words = lines[i];
-
-                            TimeSpan start = words.First().Start;
-                            TimeSpan end = words.Last().End;
-                            if (Speed != 1.0)
-                            {
-                                start = start / Speed;
-                                end = end / Speed;
-                            }
-                            Dialogue dialogue = new Dialogue()
-                            {
-                                Layer = 0,
-                                Start = start,
-                                End = end,
-                                Style = Style.Name,
-                                Name = null,
-                                MarginL = 0,
-                                MarginR = 0,
-                                MarginV = 0,
-                                Effect = null,
-                            };
-
-                            for (int j = 0; j < words.Count; j++)
-                            {
-                                var current = words[j];
-                                DialogueSyllableEffect wordEffect = new()
-                                {
-                                    Syllable = current.Word,
-                                    WordTime = (current.End - current.Start) / Speed,
-                                    Effect = effect
-                                };
-                                dialogue.DialogueSyllableEffects.Add(wordEffect);
-
-                                var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
-                                if (next is not null)
-                                {
-                                    //insert space
-                                    DialogueSyllableEffect spaceEffect = new()
-                                    {
-                                        Syllable = " ",
-                                        WordTime = (next.Start - current.End) / Speed,
-                                        Effect = effect
-                                    };
-                                    dialogue.DialogueSyllableEffects.Add(spaceEffect);
-                                }
-                                wordIndex++;
-                            }
-
-                            dialogues.Add(dialogue);
+                            case 0://bottom
+                                yOffset = -i * lineHeight;
+                                break;
+                            case 1://mid 
+                                   //lineCount =2, i= 0 -> -0.5 ; i=1 -> +0.5
+                                   //lineCount =3, i= 0 -> -1 ; i=1 -> 0 ; i=2 -> +1
+                                yOffset = (i - (lineCount - 1) / 2.0f) * lineHeight;
+                                break;
+                            case 2://top
+                                yOffset = i * lineHeight;
+                                break;
                         }
                     }
-                    else
-                    {
-                        TimeSpan start = lines.First().First().Start;
-                        TimeSpan end = lines.Last().Last().End;
-                        if (Speed != 1.0)
-                        {
-                            start = start / Speed;
-                            end = end / Speed;
-                        }
-                        Dialogue dialogue = new Dialogue()
-                        {
-                            Layer = 0,
-                            Start = start,
-                            End = end,
-                            Style = Style.Name,
-                            Name = null,
-                            MarginL = 0,
-                            MarginR = 0,
-                            MarginV = 0,
-                            Effect = null,
-                        };
-                        for (int i = 0; i < lines.Count; i++)
-                        {
-                            var words = lines[i];
-                            for (int j = 0; j < words.Count; j++)
-                            {
-                                var current = words[j];
-                                var next = allWords.Skip(wordIndex + 1).FirstOrDefault();
-                                var nextInLine = words.Skip(j + 1).FirstOrDefault();
-
-                                DialogueSyllableEffect wordEffect = new()
-                                {
-                                    Syllable = current.Word,
-                                    WordTime = (current.End - current.Start) / Speed,
-                                    Effect = effect
-                                };
-                                dialogue.DialogueSyllableEffects.Add(wordEffect);
-
-                                if (nextInLine is not null)
-                                {
-                                    //insert space
-                                    DialogueSyllableEffect spaceEffect = new()
-                                    {
-                                        Syllable = " ",
-                                        WordTime = (nextInLine.Start - current.End) / Speed,
-                                        Effect = effect
-                                    };
-                                    dialogue.DialogueSyllableEffects.Add(spaceEffect);
-                                }
-                                else
-                                {
-                                    if (next is not null)
-                                    {
-                                        DialogueSyllableEffect beforeLineBreakEffect = new()
-                                        {
-                                            Syllable = " ",
-                                            WordTime = (next.Start - current.End) / Speed,
-                                            Effect = effect
-                                        };
-                                        dialogue.DialogueSyllableEffects.Add(beforeLineBreakEffect);
-
-                                        //line break
-                                        DialogueSyllableEffect lineBreakEffect = new()
-                                        {
-                                            Syllable = "\\N",
-                                            Effect = SyllableEffect.None,
-                                        };
-                                        dialogue.DialogueSyllableEffects.Add(lineBreakEffect);
-                                    }
-                                }
-
-                                wordIndex++;
-                            }
-                        }
-
-                        dialogues.Add(dialogue);
-                    }
+                    AnchorPoints.Add(new Point(AnchorPoint.Value.X, AnchorPoint.Value.Y + (int)yOffset));
                 }
-                else if (!string.IsNullOrWhiteSpace(sentence.Text))
+                for (int i = 0; i < splitSentences.Count; i++)
                 {
-                    if (effect != SyllableEffect.None)
-                        throw new InvalidOperationException();
-                    string text = sentence.Text;
-
-                    using Bitmap bitmap = new(1, 1);
-                    using Graphics graphics = Graphics.FromImage(bitmap);
-                    using Font font = new Font(Style.Fontname, Style.Fontsize);
-                    var size = graphics.MeasureString(text, font);
-                    if (size.Width > MaxWidth)
-                    {
-                        int line = (int)Math.Ceiling(size.Width * 1.0 / MaxWidth);
-                        var str_words = sentence.Text.Split(" ").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                        var lines = str_words.SplitWords(line);
-
-                        text = string.Join("\\N", lines.Select(x => string.Join(" ", x)));
-                    }
-
-                    Dialogue dialogue = new Dialogue()
-                    {
-                        Layer = 0,
-                        Start = sentence.Start,
-                        End = sentence.End,
-                        Style = Style.Name,
-                        Name = null,
-                        MarginL = 0,
-                        MarginR = 0,
-                        MarginV = 0,
-                        Effect = null,
-                    };
-                    dialogue.DialogueSyllableEffects.Add(new DialogueSyllableEffect()
-                    {
-                        Syllable = text,
-                        Effect = SyllableEffect.None,
-                    });
-                    dialogues.Add(dialogue);
+                    yield return GenDialogue(splitSentences[i], advancedConfigure.IsUseSyl, AnchorPoints[i]);
                 }
             }
+            else
+            {
+                yield return GenDialogue(sentence, advancedConfigure.IsUseSyl, AnchorPoint);
+            }
+        }
 
+        [SupportedOSPlatform("windows")]
+        protected virtual async Task RunGenerateAssFileAsync(IEnumerable<Dialogue> dialogues, CancellationToken cancellationToken = default)
+        {
             using (StreamWriter streamWriter = new StreamWriter(TempSubFilePath, false, Encoding.UTF8))
             {
                 streamWriter.WriteLine(ScriptInfo);//[Script Info]
@@ -228,7 +116,10 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                 {
                     streamWriter.WriteLine(line);
                 }
-                dialogues.ForEach(streamWriter.WriteLine);
+                foreach (Dialogue dialogue in dialogues)
+                {
+                    streamWriter.WriteLine(dialogue);
+                }
             }
 
             ProcessStartInfo processStartInfo = new ProcessStartInfo
@@ -265,5 +156,63 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             }
         }
 
+
+        protected virtual Dialogue GenDialogue(ISentence sentence, bool isUseSyl, Point? pos = null)
+        {
+            Dialogue dialogue = new Dialogue()
+            {
+                Layer = 0,
+                Start = sentence.Start,
+                End = sentence.End,
+                Style = Style.Name,
+                Name = null,
+                MarginL = 0,
+                MarginR = 0,
+                MarginV = 0,
+                Effect = null,
+                Pos = pos,
+            };
+            if (isUseSyl)
+            {
+                if (!sentence.Words.Any())
+                    throw new InvalidOperationException($"When use syl {nameof(ISentence)}.{nameof(sentence.Words)} must have values");
+
+                for (int j = 0; j < sentence.Words.Count; j++)
+                {
+                    var current = sentence.Words[j];
+                    var next = sentence.Words.Skip(j + 1).FirstOrDefault();
+
+                    DialogueSyllableEffect wordEffect = new()
+                    {
+                        Syllable = current.Word,
+                        WordTime = current.End - current.Start,
+                        Effect = SyllableEffect.k,
+                    };
+                    dialogue.DialogueSyllableEffects.Add(wordEffect);
+                    if (next is not null)
+                    {
+                        //insert space
+                        DialogueSyllableEffect spaceEffect = new()
+                        {
+                            Syllable = " ",
+                            WordTime = next.Start - current.End,
+                            Effect = SyllableEffect.k,
+                        };
+                        dialogue.DialogueSyllableEffects.Add(spaceEffect);
+                    }
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(sentence.Text))
+                    throw new InvalidOperationException($"When not use syl, {nameof(ISentence)}.{nameof(sentence.Text)} must have value");
+                dialogue.DialogueSyllableEffects.Add(new DialogueSyllableEffect()
+                {
+                    Syllable = sentence.Text,
+                    Effect = SyllableEffect.None,
+                });
+            }
+            return dialogue;
+        }
     }
 }

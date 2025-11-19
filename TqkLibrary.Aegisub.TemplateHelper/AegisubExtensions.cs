@@ -1,40 +1,52 @@
 ﻿using System.Drawing;
-using TqkLibrary.Aegisub.Models;
+using System.Runtime.Versioning;
 using TqkLibrary.Aegisub.Interfaces;
+using TqkLibrary.Aegisub.Models;
 
 namespace TqkLibrary.Aegisub.TemplateHelper
 {
     public static class AegisubExtensions
     {
-        public static IEnumerable<IEnumerable<IWord>> SplitWords(this ISentence sentence, AssStyleData style, bool IsOneWordPerLine, int maxWidth)
+        [SupportedOSPlatform("windows")]
+        public static IEnumerable<ISentence> SplitWords(this ISentence sentence, FontMeasurer fontMeasurer, int maxWidth)
         {
-            if (IsOneWordPerLine)
             {
-                foreach (var word in sentence.Words)
+                var size = fontMeasurer.MeasureString(sentence.Text);
+                if (size.Width <= maxWidth)
                 {
-                    yield return Enumerable.Repeat(word, 1);
+                    yield return sentence;
                 }
             }
-            else
+
+            int wasTakeCount = 0;
+            for (int i = 0; i < sentence.Words.Count && wasTakeCount < sentence.Words.Count; i++)
             {
-                using Bitmap bitmap = new(1, 1);
-                using Graphics graphics = Graphics.FromImage(bitmap);
-                using Font font = new Font(style.Fontname, style.Fontsize);
-                var size = graphics.MeasureString(sentence.Text, font);
-                if (size.Width > maxWidth)
+                if (i < wasTakeCount) 
+                    continue;
+                var takewords = sentence.Words.Skip(wasTakeCount).Take(i - wasTakeCount + 1).ToList();
+                string text = string.Join(" ", takewords);
+                var size = fontMeasurer.MeasureString(text);
+                if (size.Width > maxWidth || i == sentence.Words.Count - 1)//`tràn` hoặc `cuối` hoặc `tràn với 1 word`
                 {
-                    int line = (int)Math.Ceiling(size.Width * 1.0 / maxWidth);
-                    foreach (var item in sentence.Words.SplitWords(line))
+                    var words = sentence.Words.Skip(wasTakeCount);
+                    bool isFullyWithOneWord = (i == wasTakeCount);//tràn với 1 word
+                    if (size.Width > maxWidth)//tràn
+                        words = words.Take(Math.Max(i - wasTakeCount, 1));//`tràn với 1 word` -> i - wasTakeCount = 0
+
+                    var wordsList = words.ToList();
+                    yield return new AegisubSentence()
                     {
-                        yield return item;
-                    }
-                }
-                else
-                {
-                    yield return sentence.Words;
+                        Start = sentence.Words.First().Start,
+                        End = sentence.Words.Last().End,
+                        Words = wordsList,
+                        Text = string.Join(" ", wordsList.Select(x => x.Word))
+                    };
+                    if (isFullyWithOneWord) wasTakeCount = i + 1;
+                    else wasTakeCount = i;
                 }
             }
         }
+
         public static IEnumerable<IEnumerable<T>> SplitWords<T>(this IReadOnlyList<T> words, int line)
         {
             int wordCountPerLine = (int)Math.Ceiling(words.Count * 1.0 / line);

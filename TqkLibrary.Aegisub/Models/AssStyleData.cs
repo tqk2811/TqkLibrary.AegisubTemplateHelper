@@ -1,5 +1,8 @@
 ﻿using System.Drawing;
+using System.Drawing.Text;
+using System.Runtime.Versioning;
 using TqkLibrary.Aegisub.Enums;
+using TqkLibrary.Aegisub.Interfaces;
 
 namespace TqkLibrary.Aegisub.Models
 {
@@ -29,6 +32,12 @@ namespace TqkLibrary.Aegisub.Models
         public int MarginR { get; set; } = 30;
         public int MarginV { get; set; } = 30;
         public int Encoding { get; set; } = 1;
+
+        public string? FontFilePath { get; set; }
+
+        public int GetMaxWidth(Size videoSize) => GetMaxWidth(videoSize.Width);
+        public int GetMaxWidth(int videoWidth) => videoWidth - (MarginL + MarginR);
+
 
         public static string Format
         {
