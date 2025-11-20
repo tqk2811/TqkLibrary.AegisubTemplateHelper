@@ -32,7 +32,7 @@ namespace TqkLibrary.Aegisub.Models
                 }
                 if (tags.Any())
                 {
-                    result = $" {{{string.Join(string.Empty, tags)}}}{result}";
+                    result = $"{{{string.Join(string.Empty, tags)}}} {result}";
                 }
                 return result;
             }
