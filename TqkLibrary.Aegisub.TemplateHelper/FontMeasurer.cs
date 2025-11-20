@@ -1,8 +1,8 @@
 ﻿#if SkiaSharp
 using SkiaSharp;
 #endif
-#if GDI
 using System.Drawing;
+#if GDI
 using System.Drawing.Text;
 using System.Runtime.Versioning;
 #endif
