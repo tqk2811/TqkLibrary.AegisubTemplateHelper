@@ -5,6 +5,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
+	<PropertyGroup>
+	  <DefineConstants>$(DefineConstants);SkiaSharp</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="SkiaSharp" Version="3.119.1" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<None Update="AppData\Aegisub-3.4.2-portable\**\*.*">

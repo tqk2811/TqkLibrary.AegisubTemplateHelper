@@ -50,8 +50,9 @@ namespace TqkLibrary.Aegisub.TemplateHelper
 
             await RunGenerateAssFileAsync(dialogues, cancellationToken);
         }
-
+#if GDI
         [SupportedOSPlatform("windows")]
+#endif
         protected virtual IEnumerable<Dialogue> ResolveTextOverflow(IAegisubSentence sentence, AdvancedConfigure advancedConfigure, FontMeasurer fontMeasurer)
         {
             if (IsAllowSplitLine)
