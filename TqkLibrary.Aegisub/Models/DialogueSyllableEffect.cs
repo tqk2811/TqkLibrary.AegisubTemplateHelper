@@ -16,7 +16,9 @@ namespace TqkLibrary.Aegisub.Models
             }
             else
             {
-                return $"{{\\{Effect}{(int)Math.Round(WordTime.TotalMilliseconds / 10, 0)}}}{Syllable}";
+                double ds = Math.Round(WordTime.TotalMilliseconds / 10, 0);
+                if (!string.IsNullOrWhiteSpace(Syllable) && ds < 1.0) ds = 1;
+                return $"{{\\{Effect}{(int)ds}}}{Syllable}";
             }
         }
     }
