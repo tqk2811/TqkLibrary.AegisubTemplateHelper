@@ -178,6 +178,18 @@ namespace TqkLibrary.Aegisub.TemplateHelper
                 if (!sentence.Words.Any())
                     throw new InvalidOperationException($"When use syl {nameof(IAegisubSentence)}.{nameof(sentence.Words)} must have values");
 
+                var timeDelay = sentence.Words.First().Start - sentence.Start;
+                if (timeDelay > TimeSpan.Zero)
+                {
+                    DialogueSyllableEffect delayEffect = new()
+                    {
+                        Syllable = "",
+                        WordTime = timeDelay,
+                        Effect = SyllableEffect.k,
+                    };
+                    dialogue.DialogueSyllableEffects.Add(delayEffect);
+                }
+
                 for (int j = 0; j < sentence.Words.Count; j++)
                 {
                     var current = sentence.Words[j];
