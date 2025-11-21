@@ -175,7 +175,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
             };
             if (isUseSyl)
             {
-                if (!sentence.Words.Any())
+                if (sentence.Words is null || !sentence.Words.Any())
                     throw new InvalidOperationException($"When use syl {nameof(IAegisubSentence)}.{nameof(sentence.Words)} must have values");
 
                 var timeDelay = sentence.Words.First().Start - sentence.Start;
