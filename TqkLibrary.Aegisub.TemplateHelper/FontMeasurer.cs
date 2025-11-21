@@ -2,6 +2,8 @@
 using SkiaSharp;
 #endif
 using System.Drawing;
+using System.IO;
+
 #if GDI
 using System.Drawing.Text;
 using System.Runtime.Versioning;
@@ -23,6 +25,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
         readonly Font _font;
 #endif
 #if SkiaSharp
+        readonly MemoryStream? _memoryStream;
         readonly SKTypeface _typeface;
         readonly SKFont _skFont;
         readonly SKFontMetrics _fontMetrics;
@@ -57,7 +60,9 @@ namespace TqkLibrary.Aegisub.TemplateHelper
 #if SkiaSharp
             if (File.Exists(style.FontFilePath))
             {
-                _typeface = SKTypeface.FromFile(style.FontFilePath);
+                _memoryStream = new MemoryStream(File.ReadAllBytes(style.FontFilePath));
+                _memoryStream.Seek(0, SeekOrigin.Begin);
+                _typeface = SKTypeface.FromStream(_memoryStream);
             }
             else
             {
@@ -81,6 +86,7 @@ namespace TqkLibrary.Aegisub.TemplateHelper
 #if SkiaSharp
             _skFont.Dispose();
             _typeface.Dispose();
+            _memoryStream?.Dispose();
 #endif
         }
 
