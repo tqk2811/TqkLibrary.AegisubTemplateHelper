@@ -9,12 +9,12 @@ namespace TqkLibrary.Aegisub.Models
         public required string TemplateFilePath { get; set; }
 
         [JsonConverter(typeof(AegisubTemplateDictionaryConverter))]
-        public Dictionary<string, object> FieldValues { get; set; } = new();
-
+        public Dictionary<string, AegisubTemplateConfigureFieldValue> FieldValues { get; set; } = new();
 
 
 
         static readonly Regex regex_FieldValues = new Regex("\\[([A-z0-9]+);([A-z0-9]+)\\]");
+        static readonly Regex regex_FieldValues_MinMax = new Regex("\\[([A-z0-9]+);([A-z0-9]+);([A-z0-9]+);([A-z0-9]+)\\]");
         public virtual async Task LoadFieldAsync()
         {
             var lines = await File.ReadAllLinesAsync(TemplateFilePath);
@@ -34,8 +34,34 @@ namespace TqkLibrary.Aegisub.Models
                     currentFields.Add(name);
                     if (!FieldValues.ContainsKey(name))
                     {
-                        FieldValues[name] = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue);
+                        var value = new AegisubTemplateConfigureFieldValue()
+                        {
+                            DefaultValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue)
+                        };
+                        FieldValues[name] = value;
                     }
+                }
+                matchCollection = regex_FieldValues_MinMax.Matches(line);
+                foreach (Match match in matchCollection)
+                {
+                    string name = match.Groups[1].Value;
+                    string defaultValue = match.Groups[2].Value;
+                    string min = match.Groups[3].Value;
+                    string max = match.Groups[4].Value;
+                    Type type = AegisubTemplateDictionaryConverter.GetTypeHelper(name);
+
+                    currentFields.Add(name);
+                    if (!FieldValues.ContainsKey(name))
+                    {
+                        var value = new AegisubTemplateConfigureFieldValue()
+                        {
+                            DefaultValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
+                            MinValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
+                            MaxValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
+                        };
+                        FieldValues[name] = value;
+                    }
+
                 }
             }
 
