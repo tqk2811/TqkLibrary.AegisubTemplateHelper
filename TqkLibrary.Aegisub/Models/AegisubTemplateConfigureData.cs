@@ -36,7 +36,7 @@ namespace TqkLibrary.Aegisub.Models
                     {
                         var value = new AegisubTemplateConfigureFieldValue()
                         {
-                            DefaultValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue)
+                            Value = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue)
                         };
                         FieldValues[name] = value;
                     }
@@ -55,7 +55,7 @@ namespace TqkLibrary.Aegisub.Models
                     {
                         var value = new AegisubTemplateConfigureFieldValue()
                         {
-                            DefaultValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
+                            Value = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
                             MinValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
                             MaxValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
                         };
@@ -89,11 +89,11 @@ namespace TqkLibrary.Aegisub.Models
                         var type = item.Value.GetType();
 #endif
                         string replaced;
-                        if (item.Value is System.Drawing.Color color)
+                        if (item.Value.Value is System.Drawing.Color color)
                         {
                             replaced = color.ToAssColor();
                         }
-                        else if (item.Value is float f)
+                        else if (item.Value.Value is float f)
                         {
                             replaced = f.ToString("F1");
                         }
