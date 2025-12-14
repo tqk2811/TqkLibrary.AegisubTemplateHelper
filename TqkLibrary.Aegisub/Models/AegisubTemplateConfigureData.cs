@@ -110,17 +110,28 @@ namespace TqkLibrary.Aegisub.Models
             return lines;
         }
 
-        public virtual async Task<AdvancedConfigure?> GetAdvancedConfigureAsync(CancellationToken cancellationToken = default)
+
+        public virtual async Task<IReadOnlyList<string>> GetDataLinesAsync(string headerName, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrWhiteSpace(headerName)) throw new ArgumentNullException(nameof(headerName));
             var lines = await File.ReadAllLinesAsync(TemplateFilePath, cancellationToken);
-            var line = lines.FirstOrDefault(x => x.StartsWith($"{nameof(AdvancedConfigure)}:"));
+            return lines.Where(x => x.StartsWith(headerName)).ToList();
+        }
+        public virtual async Task<T?> GetDataLineAsync<T>(CancellationToken cancellationToken = default)
+        {
+            string headerName = $"{typeof(T).Name}:";
+            var lines = await GetDataLinesAsync(headerName, cancellationToken);
+            string? line = lines.FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(line))
             {
-                var sub = line.Substring($"{nameof(AdvancedConfigure)}:".Length).Trim();
-                return JsonConvert.DeserializeObject<AdvancedConfigure>(sub);
+                var sub = line.Substring(headerName.Length).Trim();
+                return JsonConvert.DeserializeObject<T>(sub);
             }
-            return null;
+            return default(T);
         }
+
+        public virtual Task<AdvancedConfigure?> GetAdvancedConfigureAsync(CancellationToken cancellationToken = default)
+            => GetDataLineAsync<AdvancedConfigure>(cancellationToken);
 
     }
 }
