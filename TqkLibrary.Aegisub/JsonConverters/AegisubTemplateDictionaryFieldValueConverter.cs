@@ -9,9 +9,9 @@ using TqkLibrary.Aegisub.Models;
 
 namespace TqkLibrary.Aegisub.JsonConverters
 {
-    public class AegisubTemplateDictionaryConverter : JsonConverter<Dictionary<string, AegisubTemplateConfigureFieldValue>>
+    public class AegisubTemplateDictionaryFieldValueConverter : JsonConverter<Dictionary<string, AegisubTemplateConfigureFieldValue>>
     {
-        public AegisubTemplateDictionaryConverter()
+        public AegisubTemplateDictionaryFieldValueConverter()
         {
         }
 
