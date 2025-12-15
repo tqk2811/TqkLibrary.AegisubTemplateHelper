@@ -46,8 +46,8 @@ namespace TqkLibrary.Aegisub.Models
                 {
                     string name = match.Groups[1].Value;
                     string defaultValue = match.Groups[2].Value;
-                    string min = match.Groups[3].Value;
-                    string max = match.Groups[4].Value;
+                    string minValue = match.Groups[3].Value;
+                    string maxValue = match.Groups[4].Value;
                     Type type = AegisubTemplateDictionaryConverter.GetTypeHelper(name);
 
                     currentFields.Add(name);
@@ -56,8 +56,8 @@ namespace TqkLibrary.Aegisub.Models
                         var value = new AegisubTemplateConfigureFieldValue()
                         {
                             Value = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
-                            MinValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
-                            MaxValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, defaultValue),
+                            MinValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, minValue),
+                            MaxValue = AegisubTemplateDictionaryConverter.CreateDefaultTypeHelper(type, maxValue),
                         };
                         FieldValues[name] = value;
                     }
